@@ -50,7 +50,7 @@ void DoCalcTimeDerivatives(
 ```
 by writing the dynamics in state-space form, and modifying the `derivatives` state. There is also a function to get the energy of the system. The rest of the file is more or less boilerplate code which passes around (mutable) states and (mutable) parameters. 
 
-You may ask yourself what is going on with these includes? Where are these files located? 
+You may ask yourself what is going on with these includes? Where are these files located?
 ```c++
 // pendulum_plant.h
 #include "drake/logdog/pendulum/gen/pendulum_input.h"
@@ -71,7 +71,7 @@ static const PendulumGeometry* AddToBuilder(
 The appearance of the pendulum is inside its constructor, which we can change to modify the appearance of the simulation. To be honest, this file still confuses me, but its static function is only called one time in `passive_simulation.cc`.
 
 ## passive_simulation.cc
-This is the actual simulation file. First, notice that there is an additional namespace present. This is standard practice on [the official Drake github page](https://github.com/RobotLocomotion/drake/tree/master/examples/pendulum), probably to avoid name collisions, but this did not cause any problems in my testing.
+This is the actual simulation file. First, notice that there is an additional namespace present. This is standard practice on [the official Drake github page](https://github.com/RobotLocomotion/drake/tree/master/examples/pendulum), probably to avoid name collisions, but removing this additional namespace did not cause any problems in my testing.
 
 The `DEFINE_double` is part of the `gflags` package which allows us to easily parse command line arguments. This is good because we can change small simulation settings without the need to recompile (works great for tuning parameters). In the `main()` function call, we parse the command line flags, which is reflected by updating the `FLAGS_target_realtime_rate` variable in our code. For completeness, if we run
 ```
@@ -82,7 +82,7 @@ then the value of `FLAGS_target_realtime_rate` would be 0.5 for that particular 
 ```
 bazel run //logdog/pendulum:passive_simulation
 ```
-but then we have to recompile. 
+but then we have to recompile. Note that `@gflags` is listed as a dependency in `BUILD.bazel`.
 
 After the command line variables are set, the familiar Drake simulation pattern emerges. First, we construct a `DiagramBuilder`. We add a [`ConstantVectorSource`](https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1_constant_vector_source.html) system for the pendulum input. This is equilvalent to the `zero` block in Simulink. For reference, the `PendulumInput.h` header file looks like this:
 ```c++
@@ -116,7 +116,7 @@ Next, we add the pendulum to the builder, and connect the zero output from the `
 // drake/geometry/drake_visualizer.h
 using DrakeVisualizerd = DrakeVisualizer<double>;
 ```
-A `Simulator` is created from the diagram, and a mutable `pendulum_context` is obtained. This allows us to get the mutable `pendulum_state` and set the initial conditions. The target realtime rate is set, the simulator is initialized, and the simulator is run for 10 seconds. As a sanity check, we ensure that the initial energy of the pendulum is greater than the final energy (since the pendulum is being damped). If, for example, we modified the damping coefficient in `pendulum_params_named_vector.yaml` to be negative instead of position, the system would gain energy, and this check would fail.
+A `Simulator` is created from the diagram, and a mutable `pendulum_context` is obtained. This allows us to get the mutable `pendulum_state` and set the initial conditions. The target realtime rate is set, the simulator is initialized, and the simulator is run for 10 seconds. As a sanity check, we ensure that the initial energy of the pendulum is greater than the final energy (since the pendulum is being damped). If, for example, we modified the damping coefficient in `pendulum_params_named_vector.yaml` to be negative instead of positive, the system would gain energy, and this check would fail.
 ```
 abort: Failure at logdog/pendulum/passive_simulation.cc:50 in DoMain(): condition 'initial_energy > 2.0 * final_energy' failed.
 Aborted (core dumped)

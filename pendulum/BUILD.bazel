@@ -45,9 +45,7 @@ drake_cc_library(
 drake_cc_binary(
     name = "passive_simulation",
     srcs = ["passive_simulation.cc"],
-    add_test_rule = 1,
     data = [],
-    test_rule_args = ["--target_realtime_rate=0.0"],
     deps = [
         ":pendulum_geometry",
         ":pendulum_plant",
