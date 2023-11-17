@@ -12,7 +12,7 @@ bazel run //logdog/pendulum:passive_simulation
 ```
 In the browser window, you should see the pendulum swinging back and forth.
 
-# How it works, and what each file does
+# How it works and what each file does
 
 ## BUILD.bazel and .yaml files
 The `BUILD.bazel` file tells `bazel` how to build our program. Looking into its code, we see some `load` statements followed by three different function calls:
@@ -20,7 +20,7 @@ The `BUILD.bazel` file tells `bazel` how to build our program. Looking into its 
 * `drake_cc_library`
 * `drake_cc_binary` 
 
-These python functions are part of Drake, and they are located in 
+These Python functions are part of Drake, and they are located in 
 ```
 drake/tools/vector_gen/vector_gen.bzl
 ```
@@ -40,7 +40,7 @@ drake/bazel-out/k8-opt/bin/logdog/pendulum/gen/
 These files are generated from their respective `.yaml` files. It is important to note that the namespace provided in these `.yaml` files must match the namespaces provided in the other `.h` and `.cc` files throughout this example. See the `.yaml` files for more details.
 
 ## pendulum_plant.*
-This file describes the dynamcis of the pendulum, given by the equation
+This file describes the dynamics of the pendulum, given by the equation
 $$ ml^2 \ddot\theta + b\dot\theta + mgl\sin\theta = \tau $$
 where $m$ is the mass of the point-mass, $l$ is the length of the (massless) rod, $b$ is the damping coefficient, $g$ is the acceleration due to gravity, $\theta$ is the angle of the pendulum from the downward position, and $\tau$ is the torque applied to the base of the pendulum. The dynamics are described in the function 
 ```c++
@@ -48,7 +48,7 @@ void DoCalcTimeDerivatives(
       const systems::Context<T>& context,
       systems::ContinuousState<T>* derivatives) const final;
 ```
-by writing the dynamics in state-space form, and modifying the `derivatives` state. There is also a function to get the energy of the system. The rest of the file is more or less boilerplate code which passes around (mutable) states and (mutable) parameters. 
+by writing the dynamics in state-space form and modifying the `derivatives` state. There is also a function to get the energy of the system. The rest of the file is more or less boilerplate code that passes around (mutable) states and (mutable) parameters. 
 
 You may ask yourself what is going on with these includes? Where are these files located?
 ```c++
@@ -60,7 +60,7 @@ You may ask yourself what is going on with these includes? Where are these files
 These generated files are created by `drake_cc_vector_gen_library` in the `Bazel` file, as described above.
 
 ## pendulum_geometry.*
-This file describes the physical appearnace of the pendulum. This file has one public static function and no public constructor:
+This file describes the physical appearance of the pendulum. This file has one public static function and no public constructor:
 ```c++
 // pendulum_geometry.h
 static const PendulumGeometry* AddToBuilder(
@@ -84,7 +84,7 @@ bazel run //logdog/pendulum:passive_simulation
 ```
 but then we have to recompile. Note that `@gflags` is listed as a dependency in `BUILD.bazel`.
 
-After the command line variables are set, the familiar Drake simulation pattern emerges. First, we construct a `DiagramBuilder`. We add a [`ConstantVectorSource`](https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1_constant_vector_source.html) system for the pendulum input. This is equilvalent to the `zero` block in Simulink. For reference, the `PendulumInput.h` header file looks like this:
+After the command line variables are set, the familiar Drake simulation pattern emerges. First, we construct a `DiagramBuilder`. We add a [`ConstantVectorSource`](https://drake.mit.edu/doxygen_cxx/classdrake_1_1systems_1_1_constant_vector_source.html) system for the pendulum input. This is equivalent to the `zero` block in Simulink. For reference, the `PendulumInput.h` header file looks like this:
 ```c++
 // drake/bazel-out/k8-opt/bin/logdog/pendulum/gen/PendulumInput.h
 template <typename T>
@@ -111,7 +111,7 @@ elements:
     doc_units: Newton-meters
     default_value: 0.0
 ```
-Next, we add the pendulum to the builder, and connect the zero output from the `ConstantVectorSource` to the input of the pendulum. Then, a `SceneGraph` is created, and the `PendulumGeometry` is added to the builder. Finally, the `DrakeVisualizerd` is added to the builder, and the `diagram` is built. Note that `DrakeVisualizerd` is a short-hand for the `DrakeVisualizer` class when using a `double` scalar type.
+Next, we add the pendulum to the builder and connect the zero output from the `ConstantVectorSource` to the input of the pendulum. Then, a `SceneGraph` is created, and the `PendulumGeometry` is added to the builder. Finally, the `DrakeVisualizerd` is added to the builder, and the `diagram` is built. Note that `DrakeVisualizerd` is a short-hand for the `DrakeVisualizer` class when using a `double` scalar type.
 ```c++
 // drake/geometry/drake_visualizer.h
 using DrakeVisualizerd = DrakeVisualizer<double>;
